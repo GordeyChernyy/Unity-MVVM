@@ -14,7 +14,7 @@ namespace UnityMVVM.Binding
             get
             {
                 if (_viewModel == null && !string.IsNullOrEmpty(ViewModelName))
-                    _viewModel = ViewModelProvider.Instance.GetViewModelBehaviour(ViewModelName);
+                    _viewModel = ViewModelProvider.Instance.GetViewModelBehaviour(gameObject, ViewModelName);
 
                 return _viewModel;
             }
@@ -63,7 +63,7 @@ namespace UnityMVVM.Binding
                 }
                 DestroyImmediate(this);
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 result = false;
             }
@@ -75,7 +75,7 @@ namespace UnityMVVM.Binding
         {
             if (!string.IsNullOrEmpty(ViewModelName))
             {
-                _viewModel = ViewModelProvider.Instance.GetViewModelBehaviour(ViewModelName);
+                _viewModel = ViewModelProvider.Instance.GetViewModelBehaviour(gameObject, ViewModelName);
             }
 
             if (_viewModel == null)

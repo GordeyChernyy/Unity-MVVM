@@ -56,7 +56,7 @@ namespace UnityMVVM.Binding
 
         protected virtual void BindEvent()
         {
-            var vm = ViewModelProvider.Instance.GetViewModelBehaviour(ViewModelName);
+            var vm = ViewModelProvider.Instance.GetViewModelBehaviour(gameObject, ViewModelName);
 
             //TODO: Wrap PropertyInfo & MethodInfo in Serializable classes so we don't need reflection here
 

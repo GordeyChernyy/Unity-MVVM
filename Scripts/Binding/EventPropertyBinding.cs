@@ -48,7 +48,7 @@ namespace UnityMVVM.Binding
 
         public override void RegisterDataBinding()
         {
-            _dstViewModel = ViewModelProvider.Instance.GetViewModelBehaviour(ViewModelName);
+            _dstViewModel = ViewModelProvider.Instance.GetViewModelBehaviour(gameObject, ViewModelName);
 
             dst = new BindTarget(_dstViewModel, DstPropName);
 
