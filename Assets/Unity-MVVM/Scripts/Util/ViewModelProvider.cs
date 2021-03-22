@@ -12,43 +12,21 @@ namespace UnityMVVM.Util
         public static Type ViewModelBaseType => typeof(ViewModelBase);
         public static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
 
-        public static Assembly UserAssembly
-        {
-            get
-            {
-                if (_userAssembly == null)
-                {
-                    try
-                    {
-                        _userAssembly = Assembly.Load("Assembly-CSharp");
-                    }
-                    catch
-                    {
-
-                    }
-                }
-
-                return _userAssembly;
-            }
-        }
-        static Assembly _userAssembly;
-
-
+        static UserAssemblyProvider _assemblyProvider;
+        static UserAssemblyProvider AssemblyProvider =>
+            _assemblyProvider ?? (_assemblyProvider = UserAssemblyProvider.LoadOrCreate());
 
         public static List<string> Viewmodels
         {
             get
             {
-                if (_viewModels == null)
+                if (_viewModels == null || _viewModels.Count == 0)
                 {
                     _viewModels = GetViewModels(Assembly.GetExecutingAssembly()); // Samples
-
-                    if (UserAssembly != null)
-                        _viewModels = _viewModels.Concat(GetViewModels(UserAssembly)).ToList(); // User Assembly
+                    AssemblyProvider.Assemblies.ForEach(
+                        a => _viewModels = _viewModels.Concat(GetViewModels(a)).ToList());
                 }
-
                 return _viewModels;
-
             }
         }
         static List<string> _viewModels = null;
@@ -63,7 +41,11 @@ namespace UnityMVVM.Util
         {
             Type t = null;
 
-            t = UserAssembly?.GetType(typeString);
+            foreach (var a in AssemblyProvider.Assemblies)
+            {
+                t = a.GetType(typeString);
+                if (t != null) break;
+            }
 
             if (t == null)
                 t = ExecutingAssembly.GetType(typeString);
@@ -84,8 +66,11 @@ namespace UnityMVVM.Util
             return vm;
         }
 
-        internal ViewModelBase GetViewModelBehaviour(string viewModelName)
+        internal ViewModelBase GetViewModelBehaviour(GameObject source, string viewModelName)
         {
+            var vmr = source.GetComponent<ViewModelReference>();
+            if (vmr != null && vmr.ViewModel != null) return vmr.ViewModel;
+
             var vm = GetComponent(ViewModelProvider.GetViewModelType(viewModelName));
 
             if (vm == null)
